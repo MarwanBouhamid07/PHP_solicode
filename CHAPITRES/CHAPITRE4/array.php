@@ -6,7 +6,7 @@ array_push($menu,"cooca");
 
 unset($menu[5]);
 
-echo 'this is our menu: <br>';
+echo 'we have '.count($menu) .'and this is our menu: <br>';
 foreach($menu as $menu){
 echo "<b>$menu</b> <br>";
 };
@@ -21,3 +21,5 @@ $prixMenu = array(
 ) ;
 
 echo "prix of ". $menu[4] ." is ". $prixMenu["juic"];
+
+
