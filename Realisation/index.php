@@ -1,22 +1,22 @@
+
 <?php
 session_start();
 
-if (!isset($_SESSION['liste_avis'])) {
-    $_SESSION['liste_avis'] = [];
+if (!isset($_SESSION['all_reviews']) ) {
+    $_SESSION['all_reviews'] = [];
 }
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" ) {
    $newReview = [
         "nom" => $_POST['nom'],
         "email" => $_POST['mail'],
         "message" => $_POST['commentaire'],
         "date" => date("d/m/y - H:i") 
         ];
+        $ligne = "<<".$newReview["nom"]."|".$newReview["email"]."|".$newReview["message"]."|".$newReview["date"] .">>\n";
+        file_put_contents("information.txt", $ligne, FILE_APPEND);
         array_unshift($_SESSION['all_reviews'],$newReview);
-      
-        
-        
-
-
+        header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
 
 if (isset($_GET['delete'])) {
@@ -27,6 +27,11 @@ if (isset($_GET['delete'])) {
         $_SESSION['all_reviews'] = array_values($_SESSION['all_reviews']);
     }
     header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
+}
+if(isset($_POST['remove'])){
+    $_SESSION['all_reviews'] = [];
+     header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 ?>
@@ -62,7 +67,7 @@ if (isset($_GET['delete'])) {
                 </div>
 
                 <div class="input-group">
-                    <label for="mail">Adresse Email</label>
+                     <label for="mail">Adresse Email</label>
                     <input type="email" id="mail" name="mail" placeholder="exemple@mail.com" required>
                 </div>
 
@@ -74,16 +79,18 @@ if (isset($_GET['delete'])) {
                 <div class="actions">
                     <button type="submit" class="btn-primary">Envoyer</button>
                     <button id="btn-secondary" type="button" class="btn-secondary"><span id="on" >Voir les avis </span> <span id="less" class="less">less</span></button>
-                    <button type="button" name="remove" id="remove" style="background:red; margin:auto;" class="btn-primary remove">Supprime tout</button>
                 </div>
+            </form>
+            <form method='POST' style='width: 100%;margin: auto;display: flex;'>
+                <button type="submit" name="remove" id="remove" style="background:red; margin:auto;margin-top:20px;" class="btn-primary remove">Supprime tout</button>
             </form>
         </section>
 
    <section class="reviews-section">
             <h3>Derniers avis</h3>
-            
             <div id="displayArea" class="displayArea">
-                <?php
+               
+  <?php
 if (isset($_SESSION['all_reviews'])) {
     $count = 0;
     foreach ($_SESSION['all_reviews'] as $key => $review) {
@@ -94,13 +101,12 @@ if (isset($_SESSION['all_reviews'])) {
                 <a href=\"?delete=$key\" style=\"color:red; float:right;\">Supprimer</a>
             </div>
             <p class=\"card-text\">".htmlspecialchars($review['message'])."</p>
+            <p class=\"date\">".htmlspecialchars($review['date'])."</p>
         </div>";
         if(++$count == 5) break;
     }
 }
 ?>
-
-
             </div>
         </section>
             </section>
@@ -116,5 +122,4 @@ if (isset($_SESSION['all_reviews'])) {
 </script>
 </body>
 </html>
-
 
