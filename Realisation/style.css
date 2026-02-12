@@ -5,7 +5,19 @@
     --card-bg: #ffffff;
     --text-color: #333;
 }
+/* اجعل الكلمات تظهر بشكل طبيعي */
+.less {
+    display: none; /* يختفي فقط عندما تكون القائمة مغلقة */
+}
 
+/* عندما تفتح القائمة، سنستخدم JS لتبديل العرض */
+.show-inline {
+    display: inline !important;
+}
+
+.hide-none {
+    display: none !important;
+}
 
 body {
     background-color: var(--bg-color);

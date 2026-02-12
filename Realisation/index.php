@@ -1,18 +1,67 @@
+
 <?php
 session_start();
 
-if (!isset($_SESSION['all_reviews'])) {
+if (!isset($_SESSION['all_reviews']) ) {
     $_SESSION['all_reviews'] = [];
 }
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && !isset($_POST['remove'])) {
+    //;  
    $newReview = [
         "nom" => $_POST['nom'],
         "email" => $_POST['mail'],
         "message" => $_POST['commentaire'],
         "date" => date("d/m/y - H:i") 
         ];
-        array_unshift($_SESSION['all_reviews'],$newReview);
+        $ligne = "<<".$newReview["nom"]."|".$newReview["email"]."|".$newReview["message"]."|".$newReview["date"] .">>\n";
+        file_put_contents("information.txt", $ligne, FILE_APPEND);
+          if (file_exists("information.txt")) {
+        $rows = file("information.txt", FILE_IGNORE_NEW_LINES);
+        $reverseArray = array_reverse($rows);
+        
+
+
+
+
+
+
+        foreach ($reverseArray as $row) {
+            $cleanLine = trim($row, "<>");
+            $cleanLine = trim($cleanLine, "|");
+            $data = explode("|", $cleanLine);
+
+            $datas = [
+                "nom"=> $data[0],
+                "email"=> $data[1],
+                "message"=> $data[2],
+                "date"=> $data[3],
+            ];
+            array_unshift($_SESSION['all_reviews'],$newReview);
+        }
+    }
+        // array_unshift($_SESSION['all_reviews'],$newReview);
+        header("Location: " . $_SERVER['PHP_SELF']);
+    exit;
 }
+
+//   if (file_exists("information.txt")) {
+//         $rows = file("information.txt", FILE_IGNORE_NEW_LINES);
+//         $reverseArray = array_reverse($rows);
+        
+//         foreach ($reverseArray as $row) {
+//             $cleanLine = trim($row, "<>");
+//             $cleanLine = trim($cleanLine, "|");
+//             $data = explode("|", $cleanLine);
+
+//             $datas = [
+//                 "nom"=> $data[0],
+//                 "email"=> $data[1],
+//                 "message"=> $data[2],
+//                 "date"=> $data[3],
+//             ];
+//             array_unshift($_SESSION['all_reviews'],$newReview);
+//         }
+//     }
 
 if (isset($_GET['delete'])) {
     $id = $_GET['delete'];
@@ -20,12 +69,16 @@ if (isset($_GET['delete'])) {
         unset($_SESSION['all_reviews'][$id]); // Remove the specific item
         // Re-index the array so there are no holes
         $_SESSION['all_reviews'] = array_values($_SESSION['all_reviews']);
-    }
-    header("Location: " . $_SERVER['PHP_SELF']);
+        file_put_contents("information.txt",$_SESSION['all_reviews']);
+        }
+        header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
 if(isset($_POST['remove'])){
     $_SESSION['all_reviews'] = [];
+
+        file_put_contents("information.txt",$_SESSION['all_reviews']);
+    // file_put_contents("information.txt",'');
      header("Location: " . $_SERVER['PHP_SELF']);
     exit;
 }
@@ -83,9 +136,9 @@ if(isset($_POST['remove'])){
 
    <section class="reviews-section">
             <h3>Derniers avis</h3>
-            
             <div id="displayArea" class="displayArea">
-                <?php
+               
+  <?php
 if (isset($_SESSION['all_reviews'])) {
     $count = 0;
     foreach ($_SESSION['all_reviews'] as $key => $review) {
@@ -102,11 +155,8 @@ if (isset($_SESSION['all_reviews'])) {
     }
 }
 ?>
-
-
             </div>
         </section>
-            </section>
     </div>
 <script>
     
@@ -119,5 +169,4 @@ if (isset($_SESSION['all_reviews'])) {
 </script>
 </body>
 </html>
-
 
